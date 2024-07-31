@@ -1,3 +1,5 @@
+ PROJECT: AWS AUTHOURIZATION FOR A USER USING KUBERNETES RBAC CONFIGURATION 
+
   ##################### Create AWS EKS clsuster #######################################################################
 
 ## Pre-requisite links
@@ -6,7 +8,12 @@
 ## Pre-requisite links
   https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
 
-  # install eksctl
+#If this your first time of installing this on aws linux instance, remove the preinstalled yum version on it
+
+$sudo yum remove aws cli
+
+
+# install eksctl
 
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 
