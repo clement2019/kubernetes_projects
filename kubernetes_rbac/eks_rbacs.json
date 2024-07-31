@@ -6,6 +6,47 @@
 ## Pre-requisite links
   https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
 
+  # install eksctl
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+sudo mv /tmp/eksctl /usr/local/bin
+
+eksctl version
+#==================================
+## install aws cli
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+sudo apt install unzip 
+unzip awscliv2.zip 
+sudo ./aws/install
+
+#check the version
+
+aws --version
+#======================================
+#now check if you have kubectl on your machine, run the command below
+$kubectl version
+$kubectl version --client
+
+#if not exist the install kubectl on linux used the link below
+
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux
+
+
+#give permissions to kubectl
+
+chmod +x kubectl
+
+#Move the kubectl into the usr/local/bin
+$mv kubectl /usr/local/bin
+
+#verfy the installation of kubectl
+
+$kubectl version
+
+#====================================
+
+
 ## Create EKS cluster
   eksctl create cluster --name eks-cluster-204 --node-type t2.large --nodes 1 --nodes-min 1 --nodes-max 2 --region eu-west-2
 
@@ -44,7 +85,7 @@ aws iam create-access-key --user-name rbac-user
 
 #now IAM user created but does not have acess to kubenetes RBAC
 
-Now change to another terminal where u are not the admin and use the newly generated IAM accesskey and secret to authenticate into aws
+Now log into the terminal where u are not the admin and use the newly generated IAM accesskey and secret to authenticate into aws
 
 aws configure
 
@@ -72,23 +113,32 @@ error: error validating "./aws-auth.yaml": error validating data: failed to
  download openapi: the server has asked for the client to provide credentials;
  if you choose to ignore these errors, turn validation off with --validate=false
 
-#you need to kill the other terminal and relonging again with your rbac-user credentials
-
-#clear you must loggin again in the old terminal with the admin credentials
+#clear you must login again in the terminal with the admin credentials by ruuning the command below
 
 aws configure
 
-#after run
+#after run the below command to confirm your indenity
+
 aws sts get-caller-identity 
+
 #now run kubectl apply -f ./aws-auth.yaml
+
 Warning: resource configmaps/aws-auth is missing the
  kubectl.kubernetes.io/last-applied-configuration annotation which is required by
   kubectl apply. kubectl apply should only be used on resources created declaratively 
   by either kubectl create --save-config or kubectl apply.
    The missing annotation will be patched automatically.
 configmap/aws-auth configured
-#now bring up the another terminal and login as rbac-user
+
+#now login into the terminal as rbac-user by runing the command below
+
 aws configure
+
+#after run the below command to confirm your indenity
+
+aws sts get-caller-identity 
+
+
 ## Verify newly created user after login AND it should throw below errors
 kubectl get pods -n rbac-test
 #error: You must be logged in to the server (Unauthorized)-----this one use case that proves that a user without administratieve access cannot come and 
