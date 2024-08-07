@@ -1,0 +1,57 @@
+## Create AWS EKS clsuster
+
+Create an ubuntu ec2 instance in aws of type t3.small
+
+Update the ubuntu image to latest version:
+sudo apt-get update && apt-get upgrade -y
+
+  ## Pre-requisite links
+https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
+
+## install eksctl
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+sudo mv /tmp/eksctl /usr/local/bin
+
+eksctl version
+
+
+## install aws cli
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+sudo apt install unzip 
+unzip awscliv2.zip 
+sudo ./aws/install
+
+#check the version
+
+aws --version
+Now log authenticate yourself within the aws infrastructure using the command below
+
+aws configure
+access-key:
+secrets-key:
+region:
+formart:
+
+#after the above run to the below to confirm if authenticated in aws
+aws sts get caller-identity
+{
+    "UserId": "",
+    "Account": "",
+    "Arn": "arn:aws:iam::user/aws-auto-user"
+}
+#=====================================================
+## Create EKS cluster
+eksctl create cluster --name eks-amazon-mp-206 --node-type t2.large --nodes 3 --nodes-min 3 --nodes-max 5 --region eu-west-2
+
+## Get EKS Cluster service
+eksctl get cluster --name eks-amazon-mp-206 --region eu-west-2
+
+## Get EKS Pod data.
+kubectl get pods --all-namespaces
+
+## Delete EKS cluster
+eksctl delete cluster --name eks-amazon-mp-206 --region eu-west-2
+##or 
+eksctl delete cluster --region=eu-west-2 --name=eks-amazon-mp-206
