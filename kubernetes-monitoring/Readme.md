@@ -18,6 +18,7 @@ With its powerful query language and support for multi-dimensional data, Prometh
 Monitoring AWS EKS Architecture
 
 ## Why Use Helm?
+
 Helm serves as a package manager tailored for Kubernetes environments. With Helm, deploying complex applications or managing multiple resources becomes simplified and streamlined.
 Here’s why leveraging Helm is advantageous:
 Package Management: Helm offers a structured way to manage and organize Kubernetes manifests, making it easier to deploy and manage applications and services within your cluster.
@@ -27,23 +28,32 @@ Efficiency: By utilizing Helm, you can ensure that your Kubernetes deployments a
 In essence, Helm empowers Kubernetes users to streamline their deployment workflows, enhance efficiency, and maintain consistency across their infrastructure.
 
 ##Prerequisites
+
 Before you start creating, you’ll need the following:
 
 ## an AWS account;
 identity and access management (IAM) credentials and programmatic access;
+
 AWS credentials that are set up locally with aws configure;
 
 AWS Ubuntu 22.04 LTS Instance.
+
 User with sudo access (see the Initial Server Setup with Ubuntu 22.04 tutorial for details).
+
 Install some command-line tools .i.e. – eksctl, kubectl, and Helm Chart.
 
 kubectl version --client
+
 helm version
+
 eksctl version
+
 aws –version
+
 Aws configure
 
 Now install the eks cluster using the command below:
+
 eksctl create cluster --name=eks-cluster-amp-207 --region=eu-west-2 --version=1.30 --nodegroup-name=my-nodes-207 --node-type=t3.medium --managed --nodes=2 --nodes-min=2 --nodes-max=3
 
 ## Once the cluster is ready
@@ -51,25 +61,32 @@ eksctl create cluster --name=eks-cluster-amp-207 --region=eu-west-2 --version=1.
 
 ## Confirm your cluster
 eksctl get cluster --name eks-cluster-amp-207 --region eu-west-2
+
 ## Update Kube config by entering below command:
 
 aws eks update-kubeconfig --name eks-cluster-amp-207 --region eu-west-2
+
 Added new context arn:aws:eks:eu-west-2:759623136685:cluster/eks-cluster-amp-207 to /home/ubuntu/.kube/config
 
 ## Connect to EKS cluster using kubectl commands
 
 kubectl get nodes
+
 kubectl get ns
 
 #We need to add the Helm Stable Charts for your local client. Execute the below command:
+
 helm repo add stable https://charts.helm.sh/stable
 
 #Add Prometheus Helm Repository
+
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
 "prometheus-community" has been added to your repositories
 
 ## Create Prometheus Namespace
 kubectl create namespace prometheus
+
 namespace/prometheus created
 
 kubectl get namespace
@@ -85,11 +102,17 @@ helm install stable prometheus-community/kube-prometheus-stack -n prometheus
 kubectl get pods -n prometheus
 NAME                                                     READY   STATUS    RESTARTS   AGE
 alertmanager-stable-kube-prometheus-sta-alertmanager-0   2/2     Running   0          12m
+
 prometheus-stable-kube-prometheus-sta-prometheus-0       2/2     Running   0          12m
+
 stable-grafana-7566578c4f-q4v8p                          3/3     Running   0          12m
+
 stable-kube-prometheus-sta-operator-8555f478ff-vkqrj     1/1     Running   0          12m
+
 stable-kube-state-metrics-b65996c8d-kmttd                1/1     Running   0          12m
+
 stable-prometheus-node-exporter-v2xrs                    1/1     Running   0          12m
+
 stable-prometheus-node-exporter-z4t92                    1/1     Running   0          12m
 
 # to check the services file (svc) of the Prometheus
@@ -110,6 +133,7 @@ command to get the svc file
 
 
 kubectl edit svc stable-kube-prometheus-sta-prometheus -n prometheus
+
 service/stable-kube-prometheus-sta-prometheus edited
 
 
@@ -127,12 +151,14 @@ kubectl edit svc stable-grafana -n prometheus
 service/stable-grafana edited
 
 #Use the link found on the LoadBalancer for stable grafana to login
+
 ad9b552b0d85f4db783fd3f5972c43ff-1568231178.eu-west-2.elb.amazonaws.com
 
 #now you have the grafana interface, pls u need to now login use the command below to  get the secrest and password to login the username is admin
 
 
 kubectl get secret --namespace prometheus stable-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
 Now u are in grafana
 
 the Entire data of the cluster
