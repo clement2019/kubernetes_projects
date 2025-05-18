@@ -1,4 +1,4 @@
-## Aws Eks Monitoring With Prometheus-Grafana 2
+## Aws Eks Monitoring With Prometheus embeded with Grafana(not separated)
 
 ## What is Amazon EKS?
 Amazon EKS (Elastic Kubernetes Service) is a managed Kubernetes service provided by Amazon Web Services (AWS). It simplifies the process of deploying, managing, and scaling containerized applications using Kubernetes on AWS infrastructure.
@@ -27,7 +27,12 @@ Simplified Installation: Helm drastically simplifies the installation process by
 Efficiency: By utilizing Helm, you can ensure that your Kubernetes deployments are efficient and consistent. Helm charts encapsulate best practices and standardized configurations, facilitating smoother deployments and reducing the risk of errors.
 In essence, Helm empowers Kubernetes users to streamline their deployment workflows, enhance efficiency, and maintain consistency across their infrastructure.
 
-##Prerequisites
+
+for the complet list of kuberntes resources
+
+kubectl api-resources
+
+### Prerequisites
 
 Before you start creating, you’ll need the following:
 
@@ -36,9 +41,8 @@ identity and access management (IAM) credentials and programmatic access;
 
 AWS credentials that are set up locally with aws configure;
 
-AWS Ubuntu 22.04 LTS Instance.
-
-User with sudo access (see the Initial Server Setup with Ubuntu 22.04 tutorial for details).
+AWS Ubuntu 22.04 LTS Instance of type t2.small or t3.medium
+.
 
 Install some command-line tools .i.e. – eksctl, kubectl, and Helm Chart.
 
@@ -52,21 +56,27 @@ aws –version
 
 Aws configure
 
+## Kubernetes Cluster Creation
+
 Now install the eks cluster using the command below:
 
 eksctl create cluster --name=eks-cluster-amp-207 --region=eu-west-2 --version=1.30 --nodegroup-name=my-nodes-207 --node-type=t3.medium --managed --nodes=2 --nodes-min=2 --nodes-max=3
 
+### Project proper
+
 ## Once the cluster is ready
+
 #We can verify the cluster by logging into the AWS Console
 
 ## Confirm your cluster
+
 eksctl get cluster --name eks-cluster-amp-207 --region eu-west-2
 
 ## Update Kube config by entering below command:
 
 aws eks update-kubeconfig --name eks-cluster-amp-207 --region eu-west-2
 
-Added new context arn:aws:eks:eu-west-2:759623136685:cluster/eks-cluster-amp-207 to /home/ubuntu/.kube/config
+Added new context arn:aws:eks:eu-west-2:759623136000000:cluster/eks-cluster-amp-207 to /home/ubuntu/.kube/config
 
 ## Connect to EKS cluster using kubectl commands
 
@@ -78,13 +88,14 @@ kubectl get ns
 
 helm repo add stable https://charts.helm.sh/stable
 
-#Add Prometheus Helm Repository
+# Add Prometheus Helm Repository
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
 "prometheus-community" has been added to your repositories
 
 ## Create Prometheus Namespace
+
 kubectl create namespace prometheus
 
 namespace/prometheus created
@@ -92,15 +103,22 @@ namespace/prometheus created
 kubectl get namespace
 
 ## Install Prometheus using Helm
+
 helm install stable prometheus-community/kube-prometheus-stack -n prometheus
+
 ## The above command is used to install kube-Prometheus-stack.
 
  The helm repo kube-stack-Prometheus comes with a Grafana deployment embedded ( as the default one ).
 
-#To verify if Prometheus has been successfully installed using Helm on the EC2 instance, you can execute the following command:
+# To verify if Prometheus has been successfully installed using Helm on the EC2 instance, you
+
+ can execute the following command:
 
 kubectl get pods -n prometheus
-NAME                                                     READY   STATUS    RESTARTS   AGE
+
+NAME 
+                                                    READY   STATUS    RESTARTS   AGE
+
 alertmanager-stable-kube-prometheus-sta-alertmanager-0   2/2     Running   0          12m
 
 prometheus-stable-kube-prometheus-sta-prometheus-0       2/2     Running   0          12m
@@ -119,16 +137,26 @@ stable-prometheus-node-exporter-z4t92                    1/1     Running   0    
 kubectl get svc -n prometheus
 
 
-The inclusion of Grafana alongside Prometheus in the stable version confirms the successful installation of Prometheus. Since Grafana is bundled with Prometheus, there’s no need for a separate installation.
+The inclusion of Grafana alongside Prometheus in the stable version confirms the successful 
 
-Expose Prometheus and Grafana to the external world
+installation of Prometheus. Since Grafana is bundled with Prometheus, there’s no need for a 
+
+separate installation.
+
+Expose Prometheus and Grafana to the external word
+
 Let’s expose Prometheus and Grafana to the external world
+
 there are 2 ways to expose
 
 1. through Node Port
+
 2. through LoadBalancer
+
 let’s go with the LoadBalancer
+
 to attach the load balancer we need to change from ClusterIP to LoadBalancer
+
 command to get the svc file
 
 
@@ -137,47 +165,72 @@ kubectl edit svc stable-kube-prometheus-sta-prometheus -n prometheus
 service/stable-kube-prometheus-sta-prometheus edited
 
 
-#now confirm if this has been done
+## now confirm if this has been done
 kubectl get svc -n prometheus
-#As evidenced, a load balancer has been provisioned for Prometheus, allowing access via the link provided on port 9090. As shown below
+
+## As evidenced, a load balancer has been provisioned for Prometheus, allowing access via the
+
+ link provided on port 9090. As shown below
 
 
 a0e221809e10345029d9ae3e78a94070-1720925258.eu-west-2.elb.amazonaws.com:9090
 
-#Now,let’s change the SVC file of the Grafana and expose it to the outer world
-#command to edit the SVC file of grafana
+## Now,let’s change the SVC file of the Grafana and expose it to the outer world
+
+## command to edit the SVC file of grafana
 
 kubectl edit svc stable-grafana -n prometheus
+
 service/stable-grafana edited
 
-#Use the link found on the LoadBalancer for stable grafana to login
+#now get the svc again now it includes that of grafana
+
+kubectl get svc -n prometheus
+
+## Use the link found on the LoadBalancer for stable grafana to login
 
 ad9b552b0d85f4db783fd3f5972c43ff-1568231178.eu-west-2.elb.amazonaws.com
 
-#now you have the grafana interface, pls u need to now login use the command below to  get the secrest and password to login the username is admin
+# now you have the grafana interface, pls u need to now login use the command below to  get 
+
+the secrest and password to login the username is admin
 
 
 kubectl get secret --namespace prometheus stable-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 
 Now u are in grafana
 
-the Entire data of the cluster
+## the Entire data of the cluster
+
 where we can able to see the entire data of the EKS cluster
+
 1. CPU and RAM use
+
 2. pods in a specific namespace
+
 . Pod up history
+
 4. HPA
 5. Resources by Container
-CPU used by container & limits
-network bandwidth & packet rate
-#Clean up/Deprovision-Deleting the Cluster
+
+CPU used by container & limits network bandwidth & packet rate
+
+## Clean up/Deprovision-Deleting the Cluster
 
 Now we will delete all our resources.
+
 eksctl delete cluster --name eks-cluster-amp-207 --region=eu-west-2
 
 
-Conclusion:
-In conclusion, setting up Prometheus and Grafana dashboards for monitoring AWS EKS offers a robust solution for observing and managing your Kubernetes clusters. With Prometheus collecting metrics and Grafana providing visualization capabilities, users gain insights into cluster health, resource utilization, and performance metrics.
+## Conclusion:
+
+In conclusion, setting up Prometheus and Grafana dashboards for monitoring AWS EKS offers a
+
+ robust solution for observing and managing your Kubernetes clusters. With Prometheus 
+ 
+ collecting metrics and Grafana providing visualization capabilities, users gain insights
+ 
+  into cluster health, resource utilization, and performance metrics.
 
 
 

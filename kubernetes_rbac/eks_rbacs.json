@@ -1,4 +1,4 @@
- PROJECT: AWS AUTHOURIZATION FOR A USER USING KUBERNETES RBAC CONFIGURATION 
+ ## PROJECT: AWS AUTHOURIZATION FOR A USER USING KUBERNETES RBAC CONFIGURATION 
 
   ##################### Create AWS EKS clsuster #######################################################################
 
@@ -88,7 +88,7 @@ kubectl get all -n rbac-test
 
 kubectl get pods -n rbac-test 
 
-
+# ==========================================
 ## Create IAM user and create access key
 aws iam create-user --user-name rbac-user
 

@@ -4,21 +4,29 @@
   ## Pre-requisite links
 https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
 
-## install eksctl
 
-curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+# install kubectl (good)
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
 
-sudo mv /tmp/eksctl /usr/local/bin
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+kubectl version --client //kubectl version --client --output=yaml
+================
 
-eksctl version
+# or if the above does not installed
 
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+kubectl version
+===============================
 
 ## install aws cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
 sudo apt install unzip 
 unzip awscliv2.zip 
 sudo ./aws/install
-
+aws --version
 #check the version
 
 aws --version
@@ -28,6 +36,8 @@ eksctl create cluster --name ekssecret-204 --node-type t2.large --nodes 1 --node
 
 ## Get EKS Cluster service
 eksctl get cluster --name ekssecrete_204 --region eu-west-2
+
+aws eks update-kubeconfig --name ekssecrete_204 --region eu-west-2
 
 ## Get EKS Pod data.
 kubectl get pods --all-namespaces
@@ -43,7 +53,14 @@ eksctl delete cluster --region=eu-west-2 --name=ekssecret-204
 kubectl create secret generic secretname --from-literal=username1=dXNlcm5hbWU= --from-literal=password1=dXNlcm5hbWU=
 kubectl create -f <filename.yaml>
 
-3. kubectl get secret  # To verify the secretes
+3. kubectl get ## install eksctl
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+sudo mv /tmp/eksctl /usr/local/bin
+
+eksctl version
+secret  # To verify the secretes
 
 4. Consuming Secret Values from environment variables
 4.1 kubectl create -f <filename.yaml>
